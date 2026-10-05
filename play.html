@@ -15332,7 +15332,7 @@ LX9.forEach(function(r){ LX.tr[r[0]]=r[1]; LX.es[r[0]]=r[2]; LX.pt[r[0]]=r[3]; }
   if(S(CAGE_CH,1)) S(CAGE_CH,1).cp=true;
 })();
 /* ================= fork 4: after Night at the Tower ================= */
-function wavesTick(dt,every,n,d0,d1){ CS.wv=(CS.wv===undefined?2:CS.wv)-dt; if(CS.wv<=0){ CS.wv=every; for(var i=0;i<n;i++){ var sp=randomSpawnPoint(d0||18,d1||28); if(sp) campSpawn(Math.random()<0.35?'runner':'walker',sp.x,sp.z,0,true); } } }
+function chWaves(dt,every,n,d0,d1){ CS.wv=(CS.wv===undefined?2:CS.wv)-dt; if(CS.wv<=0){ CS.wv=every; for(var i=0;i<n;i++){ var sp=randomSpawnPoint(d0||18,d1||28); if(sp) campSpawn(Math.random()<0.35?'runner':'walker',sp.x,sp.z,0,true); } } }
 function ringMesh(x,z,r,col){ var b=nb(false); tube(b,[x,0.04,z],[x,0.07,z],r,18,C(col),true); bake(b,0,1,0,0); var m=new THREE.Mesh(geoOf(b),new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:0.55})); scene.add(m); return m; }
 var VOICE_CH=CH.length;
 CH.push({
@@ -15351,7 +15351,7 @@ CH.push({
      sub:function(){ var g=voiceNear(); if(!g) return ''; return TN(0,'Сигнал: ','Signal: ')+Math.max(5,Math.min(100,Math.round(100-Math.hypot(g.x-P.x,g.z-P.z)*1.4)))+'%'; },
      at:function(){ return voiceNear(); },
      on:function(){ say('ivan','Слышишь? Отвечают! Три группы — по силе сигнала их можно найти. Иди туда, где эфир громче.','Hear that? They are answering! Three groups — you can find them by signal strength. Go where the air is loudest.'); },
-     tick:function(dt){ wavesTick(dt,6,1);
+     tick:function(dt){ chWaves(dt,6,1);
        CS.a.groups.forEach(function(g,i){ if(g.found||Math.hypot(g.x-P.x,g.z-P.z)>4) return; g.found=true; A.pickup(true);
          for(var k=0;k<2;k++){ var p=nearFree(g.x+k,g.z+1); allyAdd(p.x,p.z,0,'#5a5a4a',{name:TN(0,'Выживший','A survivor')}); } spawnItem('ammo',g.x+1,g.z,0);
          note(TN(0,'Группа найдена','Group found'),true);
@@ -15362,7 +15362,7 @@ CH.push({
      until:function(){ return CS.a.groups.every(function(g){ return g.found; }); }},
     {obj:['Возвращайся к вышке — люди пойдут за тобой','Return to the tower — the people will follow you'],
      at:function(){ return CS.a.home; },
-     tick:function(dt){ wavesTick(dt,4,2); },
+     tick:function(dt){ chWaves(dt,4,2); },
      until:function(){ return Math.hypot(P.x-CS.a.home.x,P.z-CS.a.home.z)<5; },
      done:function(){ say('ivan','Все три группы у вышки. Они спрашивают, как идти к реке.','All three groups are at the tower. They are asking how to get to the river.'); }}
   ]
@@ -15396,7 +15396,7 @@ CH.push({
      obj:function(){ var t=Math.max(0,Math.ceil(30-(CS.stepT||0))); return ['Жди у больницы, пока сдвинут удар: '+t+' с','Wait at the hospital until the strike shifts: '+t+' s']; },
      at:function(){ return CS.a.hosp; },
      on:function(){ say('hq','…Принято. Сдвигаем. Держитесь там.','…Copy. Shifting. Hold on there.'); },
-     tick:function(dt){ bombTick(dt*0.6); wavesTick(dt,3.5,2); },
+     tick:function(dt){ bombTick(dt*0.6); chWaves(dt,3.5,2); },
      until:function(){ return (CS.stepT||0)>=30; }},
     {obj:['Уходи к точке эвакуации','Head for the extraction point'],
      at:function(){ return CS.a.out; },
@@ -15525,7 +15525,7 @@ CH.push({
      sub:function(){ return CS.train?TN(0,'Тепловоз: ','Locomotive: ')+Math.max(0,Math.round(CS.train.hp/CS.train.max*100))+'%':''; },
      at:function(){ return CS.a.train; },
      on:function(){ say('ivan','Машинист открыл кран водокачки. Сорок пять секунд — и поезд пойдёт. Грохот поднял всю округу.','The driver opened the water tower valve. Forty-five seconds and the train can go. The noise has woken the whole district.'); },
-     tick:function(dt){ wavesTick(dt,3,2); },
+     tick:function(dt){ chWaves(dt,3,2); },
      until:function(){ return (CS.stepT||0)>=45; },
      done:function(){ forkAsk('bridge',['Стрелка','The points'],['Короткий путь — через старый мост: он может не выдержать. Длинный — через пригород, полный мертвецов.','The short way is over the old bridge: it may not hold. The long way runs through suburbs full of the dead.'],['Короткий, через мост','Short, over the bridge'],['Длинный, через пригород','Long, through the suburbs'],'b'); }},
     {obj:['Решай: куда перевести стрелку','Decide: where to switch the points'], until:function(){ return !!CS.f.bridge; }},
@@ -15539,7 +15539,7 @@ CH.push({
     {when:function(){ return CS.f.bridge==='b'; },
      obj:function(){ return ['Отбивайся, пока поезд идёт через пригород: '+Math.max(0,Math.ceil(30-(CS.stepT||0)))+' с','Fight them off while the train crosses the suburbs: '+Math.max(0,Math.ceil(30-(CS.stepT||0)))+' s']; },
      at:function(){ return CS.a.train; },
-     tick:function(dt){ wavesTick(dt,2.4,3); },
+     tick:function(dt){ chWaves(dt,2.4,3); },
      until:function(){ return (CS.stepT||0)>=30; }},
     {obj:['Поезд уходит к аэродрому','The train heads for the airfield'], until:function(){ return (CS.stepT||0)>2.5; }}
   ]
@@ -15622,7 +15622,7 @@ CH.push({
     {obj:['Собери людей и уходи от обломков','Gather the people and get away from the wreck'],
      at:function(){ return CS.a.mid; },
      on:function(){ say('ivan','Вы сели! Все живы? До аэродрома — поле и лесополоса. Иди медленно, дети не поспевают.','You are down! Is everyone alive? Between you and the airfield — a field and a tree line. Go slowly, the children cannot keep up.'); },
-     tick:function(dt){ wavesTick(dt,6,1); },
+     tick:function(dt){ chWaves(dt,6,1); },
      until:function(){ return Math.hypot(P.x-CS.a.mid.x,P.z-CS.a.mid.z)<4; },
      done:function(){ forkAsk('pilot',['Раненый пилот','The wounded pilot'],['Пилот не может идти. Нести его — медленнее. Оставить с ракетницей — он прикроет ваш отход.','The pilot cannot walk. Carrying him is slower. Leave him with a flare gun — he will cover your retreat.'],['Нести пилота','Carry the pilot'],['Оставить с ракетницей','Leave him with a flare gun'],'b'); }},
     {obj:['Решай: раненый пилот','Decide: the wounded pilot'], until:function(){ return !!CS.f.pilot; },
@@ -15630,7 +15630,7 @@ CH.push({
        else CS.kids.forEach(function(k){ k.slow=true; }); }},
     {obj:function(){ var n=CS.kids.filter(function(a){ return !a.dead; }).length; return ['Доведи людей до аэродрома: с тобой '+n,'Get the people to the airfield: '+n+' with you']; },
      at:function(){ return CS.a.base; },
-     tick:function(dt){ wavesTick(dt,CS.f.pilot==='a'?3.5:4.5,2); },
+     tick:function(dt){ chWaves(dt,CS.f.pilot==='a'?3.5:4.5,2); },
      until:function(){ return Math.hypot(P.x-CS.a.base.x,P.z-CS.a.base.z)<5; },
      done:function(){ say('ivan','Ворота аэродрома! Учительница просит тебя о чём-то.','The airfield gates! The teacher is asking you something.'); }}
   ]
@@ -15660,7 +15660,7 @@ CH.push({
     {obj:['Решай: дорога беженцев','Decide: the refugees’ road'], until:function(){ return !!CS.f.road; }},
     {obj:function(){ return ['Первая атака на аэродром: '+Math.max(0,Math.ceil(45-(CS.stepT||0)))+' с','The first attack on the airfield: '+Math.max(0,Math.ceil(45-(CS.stepT||0)))+' s']; },
      on:function(){ say('ivan','Идут. Первая волна — проверяют оборону.','Here they come. The first wave — testing the defences.'); },
-     tick:function(dt){ wavesTick(dt,2.6,2);
+     tick:function(dt){ chWaves(dt,2.6,2);
        CS.a.mines.forEach(function(m){ if(m.used||!m.done) return; for(var i=0;i<Z.length;i++){ var z=Z[i]; if(!z.dead&&Math.hypot(z.x-m.x,z.z-m.z)<2){ m.used=true; A.boom(m.x,m.z); for(var j=0;j<Z.length;j++){ var q=Z[j]; if(!q.dead&&Math.hypot(q.x-m.x,q.z-m.z)<5) hurtZombie(q,300,false,q.x,1,q.z,'mine'); } break; } } });
        if(CS.f.road==='a'&&!CS.f.roadBoom&&(CS.stepT||0)>15){ CS.f.roadBoom=1; say('ivan','…Взрыв на западной дороге. Это были не мертвецы. Там шли люди.','…An explosion on the western road. It was not the dead. People were walking there.'); } },
      until:function(){ return (CS.stepT||0)>=45; }}
@@ -15701,7 +15701,7 @@ CH.push({
      obj:function(){ var n=canSteps('sfuel',CS.a.cans); return ['Хватай канистры, пока они в суматохе: '+n+'/3','Grab the cans while they scramble: '+n+'/3']; },
      at:function(){ return nearestLeft(CS.a.cans); },
      on:function(){ var d=CS.a.depot; A.boom(d.x+5,d.z+5); G.shake=Math.max(G.shake,1); MARS.forEach(function(m){ if(!m.dead&&Math.hypot(m.x-d.x,m.z-d.z)<9) m.onHit(999); }); for(var i=0;i<4;i++){ var sp=randomSpawnPoint(14,22); if(sp) campSpawn('runner',sp.x,sp.z,0,true); } note(TN(0,'Взрыв! Часовые сбиты — но тревога поднята','Explosion! The sentries are down — but the alarm is up'),true); },
-     tick:function(dt){ wavesTick(dt,3,2); },
+     tick:function(dt){ chWaves(dt,3,2); },
      until:function(){ return canSteps('sfuel',CS.a.cans)>=3; }},
     {when:function(){ return CS.f.raid==='b'; },
      obj:function(){ var n=canSteps('sfuel',CS.a.cans); return ['Вынеси канистры тихо: '+n+'/3','Carry the cans out quietly: '+n+'/3']; },
@@ -15711,7 +15711,7 @@ CH.push({
      until:function(){ return canSteps('sfuel',CS.a.cans)>=3; }},
     {obj:['Уходите к ангарам с топливом','Head back to the hangars with the fuel'],
      at:function(){ return CS.a.home; },
-     tick:function(dt){ wavesTick(dt,4,1); },
+     tick:function(dt){ chWaves(dt,4,1); },
      until:function(){ return Math.hypot(P.x-CS.a.home.x,P.z-CS.a.home.z)<5; },
      done:function(){ say('ivan','Три канистры. Люди из ангаров смотрят на тебя — как делить?','Three cans. The people from the hangars are looking at you — how do we split it?'); }}
   ]
@@ -15738,7 +15738,7 @@ CH.push({
      until:function(){ return Math.hypot(P.x-CS.a.cover.x,P.z-CS.a.cover.z)<4; }},
     {obj:function(){ return ['Продержись до рассвета: '+Math.max(0,Math.ceil(50-(CS.stepT||0)))+' с','Hold out until dawn: '+Math.max(0,Math.ceil(50-(CS.stepT||0)))+' s']; },
      at:function(){ return CS.a.cover; },
-     tick:function(dt){ CS.ht=(CS.ht||0)-dt; if(CS.ht<=0){ CS.ht=4; MARS.forEach(function(m){ if(!m.dead){ m.hx=P.x; m.hz=P.z; } }); } wavesTick(dt,6,1);
+     tick:function(dt){ CS.ht=(CS.ht||0)-dt; if(CS.ht<=0){ CS.ht=4; MARS.forEach(function(m){ if(!m.dead){ m.hx=P.x; m.hz=P.z; } }); } chWaves(dt,6,1);
        if((CS.stepT||0)>20&&!CS.f.parleyAsked){ CS.f.parleyAsked=1;
          forkAsk('parley',['Переговоры','Parley'],['Вожак «волков» кричит из темноты: «Отдай топливо — и мы уйдём».','The “wolves’” leader shouts from the dark: “Give us the fuel — and we will leave.”'],['Отдать топливо','Give them the fuel'],['Отбиваться','Fight them off'],'b',function(k){
            if(k==='a'){ MARS.forEach(function(m){ if(!m.dead){ m.dead=true; m.hp=0; if(m.av&&m.av.g) scene.remove(m.av.g); } }); P.hp=Math.max(30,P.hp-15); note(TN(0,'Они ушли с топливом. Тебе будет холодно','They left with the fuel. You will be cold'),true); }
@@ -15775,7 +15775,7 @@ CH.push({
     {obj:['Решай: дети','Decide: the children'], until:function(){ return !!CS.f.kids; }},
     {obj:function(){ return ['Орда! Держите оборону: '+Math.max(0,Math.ceil(50-(CS.stepT||0)))+' с','The horde! Hold the line: '+Math.max(0,Math.ceil(50-(CS.stepT||0)))+' s']; },
      at:function(){ return CS.a.village; },
-     tick:function(dt){ wavesTick(dt,2.4,3,20,30); },
+     tick:function(dt){ chWaves(dt,2.4,3,20,30); },
      until:function(){ return (CS.stepT||0)>=50; },
      done:function(){ if(CS.f.kids==='a'){ var d=decData(); if(d.kidsLost===undefined){ d.kidsLost=Math.random()<0.5; saveCamp(d); } note(d.kidsLost?TN(0,'Дети вернулись, но двое ополченцев остались в лесу прикрывать отход','The children came back, but two militiamen stayed in the woods to cover them'):TN(0,'Дети вернулись из леса — все до одного','The children came back from the woods — every one of them'),true); }
        else note(TN(0,'Дети в подвале школы целы','The children in the school basement are safe'),true);
@@ -15810,7 +15810,7 @@ CH.push({
      until:function(){ return CS.a.found.every(function(f){ return f.ok; }); }},
     {obj:['Уводи выживших с пепелища','Lead the survivors out of the ashes'],
      at:function(){ return CS.a.exit; },
-     tick:function(dt){ wavesTick(dt,4,2); },
+     tick:function(dt){ chWaves(dt,4,2); },
      until:function(){ return Math.hypot(P.x-CS.a.exit.x,P.z-CS.a.exit.z)<5; },
      done:function(){ say('ivan','Ты их вывел. Один из них спрашивает, почему у деревни не было оружия.','You got them out. One of them asks why the village had no weapons.'); }}
   ]
@@ -15855,7 +15855,7 @@ CH.push({
      until:function(){ return Math.hypot(P.x-CS.a.w2.x,P.z-CS.a.w2.z)<4; }},
     {obj:['К воротам аэродрома','To the airfield gates'],
      at:function(){ return CS.a.gate; },
-     tick:function(dt){ mineTick(); wavesTick(dt,5,1); },
+     tick:function(dt){ mineTick(); chWaves(dt,5,1); },
      until:function(){ return Math.hypot(P.x-CS.a.gate.x,P.z-CS.a.gate.z)<5; },
      done:function(){ say('ivan','Ворота. Проводник остановился — ждёт, что ты скажешь.','The gates. The guide has stopped — waiting for what you will say.'); }}
   ]
@@ -15880,7 +15880,7 @@ CH.push({
     {obj:['Конвоируй пленного к трибуналу','Escort the prisoner to the tribunal'],
      at:function(){ return CS.a.mid; },
      on:function(){ say('hq','Пленного доставить живым. Суд будет показательным.','Deliver the prisoner alive. The trial will be made an example of.'); },
-     tick:function(dt){ wavesTick(dt,6,1); },
+     tick:function(dt){ chWaves(dt,6,1); },
      until:function(){ return Math.hypot(P.x-CS.a.mid.x,P.z-CS.a.mid.z)<4; },
      done:function(){ var m=CS.a.mid; for(var i=0;i<3;i++) soldierAdd(m.x+rnd(-14,14),m.z+rnd(12,18),m.x,m.z);
        forkAsk('trade',['Обмен','The trade'],['Банда кричит: «Отдай его — и получишь бочку топлива для аэродрома».','The gang shouts: “Give him to us — and you get a drum of fuel for the airfield.”'],['Обменять','Make the trade'],['Отказать','Refuse'],'b',function(k){
